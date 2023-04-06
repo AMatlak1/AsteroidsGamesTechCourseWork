@@ -52,7 +52,15 @@ private:
 	shared_ptr<GUILabel> mScoreLabel;
 	shared_ptr<GUILabel> mLivesLabel;
 	shared_ptr<GUILabel> mGameOverLabel;
-	
+	shared_ptr<GUILabel> mHighScoreLabel;
+	shared_ptr<GUILabel> mHighScoreLabel1;
+	shared_ptr<GUILabel> mHighScoreLabel2;
+	shared_ptr<GUILabel> mHighScoreLabel3;
+	//High Score from the file 
+	int mPlayerScore = 0;
+	int mHighScoreTopFromFile = 0;
+	int mHighScoreMidFromFile = 0;
+	int mHighScoreBottomFromFile = 0;
 
 	uint mLevel;
 	uint mAsteroidCount;
@@ -60,6 +68,9 @@ private:
 	void ResetSpaceship();
 	shared_ptr<GameObject> CreateSpaceship();
 	void CreateGUI();
+	void ReadHighScoreTableFromFile();
+	void SaveHighScoreTableToFile();
+	void RefreshLabel(shared_ptr<GUILabel> guiLabel, string value);
 	void CreateAsteroids(const uint num_asteroids);
 	void CreateSplitAsteroids(const uint num_asteroids);
 	shared_ptr<GameObject> CreateExplosion();

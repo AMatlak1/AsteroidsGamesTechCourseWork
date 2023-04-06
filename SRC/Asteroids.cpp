@@ -11,6 +11,9 @@
 #include "BoundingSphere.h"
 #include "GUILabel.h"
 #include "Explosion.h"
+#include <iostream>
+#include <iomanip>
+#include <fstream>
 
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
@@ -63,6 +66,8 @@ void Asteroids::Start()
 	// Create some asteroids and add them to the world
 	CreateAsteroids(10);
 
+	ReadHighScoreTableFromFile();
+
 	//Create the GUI
 	CreateGUI();
 
@@ -71,6 +76,7 @@ void Asteroids::Start()
 
 	// Add this class as a listener of the player
 	mPlayer.AddListener(thisPtr);
+
 
 	// Start the game
 	GameSession::Start();
@@ -81,6 +87,40 @@ void Asteroids::Stop()
 {
 	// Stop the game
 	GameSession::Stop();
+}
+
+void Asteroids::ReadHighScoreTableFromFile()
+{
+	int scoreFromFile;
+	ifstream ifs;
+	ifs.open("HighScoreTable.txt");
+	if (!ifs) {
+		cout << " Failed to open" << endl;
+	} else {
+		cout << "Opened OK" << endl;
+
+		//while (ifs >> scoreFromFile) {
+		//	mHighScore3FromFile = scoreFromFile;
+		//}
+		ifs >> scoreFromFile;
+		mHighScoreTopFromFile = scoreFromFile;
+		ifs >> scoreFromFile;
+		mHighScoreMidFromFile = scoreFromFile;
+		ifs >> scoreFromFile;
+		mHighScoreBottomFromFile = scoreFromFile;
+	}
+
+	ifs.close();
+}
+
+void Asteroids::SaveHighScoreTableToFile()
+{
+	ofstream fout;
+	fout.open("HighScoreTable.txt");
+	fout << mHighScoreTopFromFile << endl;
+	fout << mHighScoreMidFromFile << endl;
+	fout << mHighScoreBottomFromFile << endl;	
+	fout.close();
 }
 
 // PUBLIC INSTANCE METHODS IMPLEMENTING IKeyboardListener /////////////////////
@@ -141,7 +181,7 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		explosion->SetRotation(object->GetRotation());
 		mGameWorld->AddObject(explosion);
 		mAsteroidCount--;
-		CreateSplitAsteroids(1);
+		CreateSplitAsteroids(2);
 		if (mAsteroidCount <= 0) 
 		{ 
 			SetTimer(500, START_NEXT_LEVEL); 
@@ -169,8 +209,48 @@ void Asteroids::OnTimer(int value)
 	if (value == SHOW_GAME_OVER)
 	{
 		mGameOverLabel->SetVisible(true);
-	}
+		mHighScoreLabel->SetVisible(true);
+		mHighScoreLabel1->SetVisible(true);
+		mHighScoreLabel2->SetVisible(true);
+		mHighScoreLabel3->SetVisible(true);
 
+		if (mHighScoreTopFromFile < mPlayerScore) {
+			std::ostringstream h_msg_stream;
+			h_msg_stream << "1: Your Score: " << mPlayerScore;
+			mHighScoreBottomFromFile = mHighScoreMidFromFile;
+			mHighScoreMidFromFile = mHighScoreTopFromFile;			
+			mHighScoreTopFromFile = mPlayerScore;
+			std::string h_score_msg = h_msg_stream.str();
+			mHighScoreLabel1->SetText(h_score_msg);
+			RefreshLabel(mHighScoreLabel2, "2: Score: " + std::to_string(mHighScoreMidFromFile));
+			RefreshLabel(mHighScoreLabel3, "3: Score: " + std::to_string(mHighScoreBottomFromFile));			
+		}
+		else if (mHighScoreMidFromFile < mPlayerScore) {
+			std::ostringstream h_msg_stream;
+			h_msg_stream << "2: Your Score: " << mPlayerScore;
+			mHighScoreBottomFromFile = mHighScoreMidFromFile;
+			mHighScoreMidFromFile = mPlayerScore;
+			std::string h_score_msg = h_msg_stream.str();
+			mHighScoreLabel2->SetText(h_score_msg);
+			RefreshLabel(mHighScoreLabel3, "3: Score: " + std::to_string(mHighScoreBottomFromFile));
+		}
+		else if (mHighScoreBottomFromFile < mPlayerScore) {
+			std::ostringstream h_msg_stream;
+			h_msg_stream << "3: Your Score: " << mPlayerScore;
+			mHighScoreBottomFromFile = mPlayerScore;
+			std::string h_score_msg = h_msg_stream.str();
+			mHighScoreLabel3->SetText(h_score_msg);
+		}
+
+		SaveHighScoreTableToFile();
+	}
+}
+
+void Asteroids::RefreshLabel(shared_ptr<GUILabel> guiLabel, string value) {
+	std::ostringstream h_msg_stream;
+	h_msg_stream << value;
+	std::string h_score_msg = h_msg_stream.str();
+	guiLabel->SetText(h_score_msg);
 }
 
 // PROTECTED INSTANCE METHODS /////////////////////////////////////////////////
@@ -253,15 +333,53 @@ void Asteroids::CreateGUI()
 	mGameOverLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
 	// Set the visibility of the label to false (hidden)
 	mGameOverLabel->SetVisible(false);
-	// Add the GUILabel to the GUIContainer  
+
+	
+	mHighScoreLabel = shared_ptr<GUILabel>(new GUILabel("High Score"));
+	mHighScoreLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
+	mHighScoreLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	mHighScoreLabel->SetVisible(false);
+
+	mHighScoreLabel1 = shared_ptr<GUILabel>(new GUILabel("1: Score: " + std::to_string(mHighScoreTopFromFile)));
+	mHighScoreLabel1->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
+	mHighScoreLabel1->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	mHighScoreLabel1->SetVisible(false);
+
+	mHighScoreLabel2 = shared_ptr<GUILabel>(new GUILabel("2: Score: " + std::to_string(mHighScoreMidFromFile)));
+	mHighScoreLabel2->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
+	mHighScoreLabel2->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	mHighScoreLabel2->SetVisible(false);
+
+	mHighScoreLabel3 = shared_ptr<GUILabel>(new GUILabel("3: Score: " + std::to_string(mHighScoreBottomFromFile)));
+	mHighScoreLabel3->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
+	mHighScoreLabel3->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	mHighScoreLabel3->SetVisible(false);
+
+
+	// Add the GUILabel to the GUIContainer  	
 	shared_ptr<GUIComponent> game_over_component
 		= static_pointer_cast<GUIComponent>(mGameOverLabel);
 	mGameDisplay->GetContainer()->AddComponent(game_over_component, GLVector2f(0.5f, 0.5f));
+
+	shared_ptr<GUIComponent> high_score_component
+		= static_pointer_cast<GUIComponent>(mHighScoreLabel);
+	mGameDisplay->GetContainer()->AddComponent(high_score_component, GLVector2f(0.4f, 0.8f));
+	shared_ptr<GUIComponent> high_score_component1
+		= static_pointer_cast<GUIComponent>(mHighScoreLabel1);
+	mGameDisplay->GetContainer()->AddComponent(high_score_component1, GLVector2f(0.4f, 0.75f));
+	shared_ptr<GUIComponent> high_score_component2
+		= static_pointer_cast<GUIComponent>(mHighScoreLabel2);
+	mGameDisplay->GetContainer()->AddComponent(high_score_component2, GLVector2f(0.4f, 0.7f));
+	shared_ptr<GUIComponent> high_score_component3
+		= static_pointer_cast<GUIComponent>(mHighScoreLabel3);
+	mGameDisplay->GetContainer()->AddComponent(high_score_component3, GLVector2f(0.4f, 0.65f));
 
 }
 
 void Asteroids::OnScoreChanged(int score)
 {
+	//to keep track
+	mPlayerScore = score;
 	// Format the score message using an string-based stream
 	std::ostringstream msg_stream;
 	msg_stream << "Score: " << score;
