@@ -66,6 +66,7 @@ void Asteroids::Start()
 	// Create some asteroids and add them to the world
 	CreateAsteroids(10);
 
+	//Reads High Score Numbers From File
 	ReadHighScoreTableFromFile();
 
 	//Create the GUI
@@ -89,19 +90,24 @@ void Asteroids::Stop()
 	GameSession::Stop();
 }
 
+//Reads High Score From the HigherScoreTable.txt File
 void Asteroids::ReadHighScoreTableFromFile()
 {
 	int scoreFromFile;
 	ifstream ifs;
 	ifs.open("HighScoreTable.txt");
 	if (!ifs) {
+		//If File fails to open the text below is displayed in terminal
 		cout << " Failed to open" << endl;
 	} else {
+		//If File opens the text below is displayed in terminal
 		cout << "Opened OK" << endl;
 
 		//while (ifs >> scoreFromFile) {
 		//	mHighScore3FromFile = scoreFromFile;
 		//}
+
+		//Reads the score in order
 		ifs >> scoreFromFile;
 		mHighScoreTopFromFile = scoreFromFile;
 		ifs >> scoreFromFile;
@@ -113,6 +119,7 @@ void Asteroids::ReadHighScoreTableFromFile()
 	ifs.close();
 }
 
+//Saves High Score Table information to the File
 void Asteroids::SaveHighScoreTableToFile()
 {
 	ofstream fout;
@@ -181,6 +188,7 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		explosion->SetRotation(object->GetRotation());
 		mGameWorld->AddObject(explosion);
 		mAsteroidCount--;
+		//Creates 2 Asteroids when one big asteroid is hit by bullet
 		CreateSplitAsteroids(2);
 		if (mAsteroidCount <= 0) 
 		{ 
@@ -208,6 +216,7 @@ void Asteroids::OnTimer(int value)
 
 	if (value == SHOW_GAME_OVER)
 	{
+		//Displays HighScoreTable when User is out of Lives and its Game over
 		mGameOverLabel->SetVisible(true);
 		mHighScoreLabel->SetVisible(true);
 		mHighScoreLabel1->SetVisible(true);
@@ -246,6 +255,7 @@ void Asteroids::OnTimer(int value)
 	}
 }
 
+//Updates the Label Order depending on if the User has beaten a score
 void Asteroids::RefreshLabel(shared_ptr<GUILabel> guiLabel, string value) {
 	std::ostringstream h_msg_stream;
 	h_msg_stream << value;
@@ -291,6 +301,7 @@ void Asteroids::CreateAsteroids(const uint num_asteroids)
 	}
 }
 
+//Creates Smaller Asteroids by half the size
 void Asteroids::CreateSplitAsteroids(const uint num_asteroids)
 {
 	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
@@ -361,6 +372,7 @@ void Asteroids::CreateGUI()
 		= static_pointer_cast<GUIComponent>(mGameOverLabel);
 	mGameDisplay->GetContainer()->AddComponent(game_over_component, GLVector2f(0.5f, 0.5f));
 
+	//Adds the GUILabels for each of the HighScoreLabels
 	shared_ptr<GUIComponent> high_score_component
 		= static_pointer_cast<GUIComponent>(mHighScoreLabel);
 	mGameDisplay->GetContainer()->AddComponent(high_score_component, GLVector2f(0.4f, 0.8f));

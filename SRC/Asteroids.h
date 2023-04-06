@@ -65,6 +65,7 @@ private:
 	uint mLevel;
 	uint mAsteroidCount;
 
+	//New headers have been added here also
 	void ResetSpaceship();
 	shared_ptr<GameObject> CreateSpaceship();
 	void CreateGUI();
