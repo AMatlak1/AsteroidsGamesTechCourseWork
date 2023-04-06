@@ -104,7 +104,7 @@ void Asteroids::OnSpecialKeyPressed(int key, int x, int y)
 	switch (key)
 	{
 	// If up arrow key is pressed start applying forward thrust
-	case GLUT_KEY_UP: mSpaceship->Thrust(20); break;
+	case GLUT_KEY_UP: mSpaceship->Thrust(10); break;
 	// If left arrow key is pressed start rotating anti-clockwise
 	case GLUT_KEY_LEFT: mSpaceship->Rotate(90); break;
 	// If right arrow key is pressed start rotating clockwise
@@ -141,6 +141,7 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		explosion->SetRotation(object->GetRotation());
 		mGameWorld->AddObject(explosion);
 		mAsteroidCount--;
+		CreateSplitAsteroids(1);
 		if (mAsteroidCount <= 0) 
 		{ 
 			SetTimer(500, START_NEXT_LEVEL); 
@@ -208,6 +209,19 @@ void Asteroids::CreateAsteroids(const uint num_asteroids)
 		asteroid->SetScale(0.2f);
 		mGameWorld->AddObject(asteroid);
 	}
+}
+
+void Asteroids::CreateSplitAsteroids(const uint num_asteroids)
+{
+	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
+	shared_ptr<Sprite> asteroid_sprite = make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+	asteroid_sprite->SetLoopAnimation(true);
+	shared_ptr<GameObject> asteroid2 = make_shared<Asteroid>();
+	asteroid2->SetBoundingShape(make_shared<BoundingSphere>(asteroid2->GetThisPtr(), 5.0f));
+	asteroid2->SetSprite(asteroid_sprite);
+	asteroid2->SetScale(0.1f);
+	mGameWorld->AddObject(asteroid2);
+
 }
 
 void Asteroids::CreateGUI()
