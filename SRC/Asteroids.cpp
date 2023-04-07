@@ -103,10 +103,6 @@ void Asteroids::ReadHighScoreTableFromFile()
 		//If File opens the text below is displayed in terminal
 		cout << "Opened OK" << endl;
 
-		//while (ifs >> scoreFromFile) {
-		//	mHighScore3FromFile = scoreFromFile;
-		//}
-
 		//Reads the score in order
 		ifs >> scoreFromFile;
 		mHighScoreTopFromFile = scoreFromFile;
@@ -188,7 +184,7 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		explosion->SetRotation(object->GetRotation());
 		mGameWorld->AddObject(explosion);
 		mAsteroidCount--;
-		//Creates 2 Asteroids when one big asteroid is hit by bullet
+		//Creates 2 smaller Asteroids when one big asteroid is hit by bullet
 		CreateSplitAsteroids(2);
 		if (mAsteroidCount <= 0) 
 		{ 
@@ -339,7 +335,7 @@ void Asteroids::CreateGUI()
 	// Create a new GUILabel and wrap it up in a shared_ptr
 	mGameOverLabel = shared_ptr<GUILabel>(new GUILabel("GAME OVER"));
 	// Set the horizontal alignment of the label to GUI_HALIGN_CENTER
-	mGameOverLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	mGameOverLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_LEFT);
 	// Set the vertical alignment of the label to GUI_VALIGN_MIDDLE
 	mGameOverLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
 	// Set the visibility of the label to false (hidden)
@@ -370,7 +366,7 @@ void Asteroids::CreateGUI()
 	// Add the GUILabel to the GUIContainer  	
 	shared_ptr<GUIComponent> game_over_component
 		= static_pointer_cast<GUIComponent>(mGameOverLabel);
-	mGameDisplay->GetContainer()->AddComponent(game_over_component, GLVector2f(0.5f, 0.5f));
+	mGameDisplay->GetContainer()->AddComponent(game_over_component, GLVector2f(0.4f, 0.5f));
 
 	//Adds the GUILabels for each of the HighScoreLabels
 	shared_ptr<GUIComponent> high_score_component
