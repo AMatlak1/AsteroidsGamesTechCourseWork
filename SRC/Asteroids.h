@@ -9,6 +9,7 @@
 #include "ScoreKeeper.h"
 #include "Player.h"
 #include "IPlayerListener.h"
+#include "AlienSpaceShip.h"
 
 class GameObject;
 class Spaceship;
@@ -49,6 +50,7 @@ public:
 
 private:
 	shared_ptr<Spaceship> mSpaceship;
+	shared_ptr<AlienSpaceShip> mAlienSpaceShip;
 	shared_ptr<GUILabel> mScoreLabel;
 	shared_ptr<GUILabel> mLivesLabel;
 	shared_ptr<GUILabel> mGameOverLabel;
@@ -56,6 +58,7 @@ private:
 	shared_ptr<GUILabel> mHighScoreLabel1;
 	shared_ptr<GUILabel> mHighScoreLabel2;
 	shared_ptr<GUILabel> mHighScoreLabel3;
+
 	//High Score from the file 
 	int mPlayerScore = 0;
 	int mHighScoreTopFromFile = 0;
@@ -64,16 +67,18 @@ private:
 
 	uint mLevel;
 	uint mAsteroidCount;
+	uint mAlienSpaceShipCount;
 
 	//New headers have been added here also
 	void ResetSpaceship();
-	shared_ptr<GameObject> CreateSpaceship();
+	shared_ptr<GameObject>CreateSpaceship();
 	void CreateGUI();
 	void ReadHighScoreTableFromFile();
 	void SaveHighScoreTableToFile();
 	void RefreshLabel(shared_ptr<GUILabel> guiLabel, string value);
+	void CreateAlienSpaceShip(const uint num_alienspaceships);
 	void CreateAsteroids(const uint num_asteroids);
-	void CreateSplitAsteroids(const uint num_asteroids);
+	void CreateSplitAsteroids(const uint num_asteroids, GLVector3f p);
 	shared_ptr<GameObject> CreateExplosion();
 	
 	const static uint SHOW_GAME_OVER = 0;

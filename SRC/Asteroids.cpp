@@ -1,3 +1,4 @@
+#include "AlienSpaceShip.h"
 #include "Asteroid.h"
 #include "Asteroids.h"
 #include "Animation.h"
@@ -23,6 +24,7 @@ Asteroids::Asteroids(int argc, char *argv[])
 {
 	mLevel = 0;
 	mAsteroidCount = 0;
+	mAlienSpaceShipCount = 0;
 }
 
 /** Destructor. */
@@ -61,10 +63,14 @@ void Asteroids::Start()
 	Animation *asteroid1_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1", 128, 8192, 128, 128, "asteroid1_fs.png");
 	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");
 
+	Animation *enemy_anim = AnimationManager::GetInstance().CreateAnimationFromFile("enemy", 128, 8192, 128, 128, "enemy_fs.png");
+
 	// Create a spaceship and add it to the world
 	mGameWorld->AddObject(CreateSpaceship());
 	// Create some asteroids and add them to the world
 	CreateAsteroids(10);
+
+	CreateAlienSpaceShip(1);
 
 	//Reads High Score Numbers From File
 	ReadHighScoreTableFromFile();
@@ -133,7 +139,9 @@ void Asteroids::OnKeyPressed(uchar key, int x, int y)
 	switch (key)
 	{
 	case ' ':
+		mAlienSpaceShip->Shoot();
 		mSpaceship->Shoot();
+		mAlienSpaceShip->Shoot();
 		break;
 	default:
 		break;
@@ -185,7 +193,7 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		mGameWorld->AddObject(explosion);
 		mAsteroidCount--;
 		//Creates 2 smaller Asteroids when one big asteroid is hit by bullet
-		CreateSplitAsteroids(2);
+		CreateSplitAsteroids(2, object->GetPosition());
 		if (mAsteroidCount <= 0) 
 		{ 
 			SetTimer(500, START_NEXT_LEVEL); 
@@ -280,6 +288,7 @@ shared_ptr<GameObject> Asteroids::CreateSpaceship()
 
 }
 
+
 void Asteroids::CreateAsteroids(const uint num_asteroids)
 {
 	mAsteroidCount = num_asteroids;
@@ -297,18 +306,47 @@ void Asteroids::CreateAsteroids(const uint num_asteroids)
 	}
 }
 
-//Creates Smaller Asteroids by half the size
-void Asteroids::CreateSplitAsteroids(const uint num_asteroids)
-{
-	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
-	shared_ptr<Sprite> asteroid_sprite = make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
-	asteroid_sprite->SetLoopAnimation(true);
-	shared_ptr<GameObject> asteroid2 = make_shared<Asteroid>();
-	asteroid2->SetBoundingShape(make_shared<BoundingSphere>(asteroid2->GetThisPtr(), 5.0f));
-	asteroid2->SetSprite(asteroid_sprite);
-	asteroid2->SetScale(0.1f);
-	mGameWorld->AddObject(asteroid2);
 
+void Asteroids::CreateAlienSpaceShip(const uint num_alienspaceships)
+{
+	
+	mAlienSpaceShipCount = num_alienspaceships;
+	for (uint i = 0; i < num_alienspaceships; i++)
+	{
+	
+		mAlienSpaceShip = make_shared<AlienSpaceShip>();
+		mAlienSpaceShip->SetBoundingShape(make_shared<BoundingSphere>(mAlienSpaceShip->GetThisPtr(), 4.0f));
+		shared_ptr<Shape> bullet_shape = make_shared<Shape>("bullet.shape");
+		mAlienSpaceShip->SetBulletShape(bullet_shape);
+		Animation *anim_ptr = AnimationManager::GetInstance().GetAnimationByName("enemy");
+		shared_ptr<Sprite> enemy_sprite
+			= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);		
+		enemy_sprite->SetLoopAnimation(true);		
+		
+		mAlienSpaceShip->SetBoundingShape(make_shared<BoundingSphere>(mAlienSpaceShip->GetThisPtr(), 10.0f));
+		mAlienSpaceShip->SetSprite(enemy_sprite);
+		mAlienSpaceShip->SetScale(0.2f);
+		mGameWorld->AddObject(mAlienSpaceShip);		
+	}
+	
+}
+
+
+//Creates Smaller Asteroids by half the size
+void Asteroids::CreateSplitAsteroids(const uint num_asteroids, GLVector3f p)
+{
+	for (uint i = 0; i < num_asteroids; i++)
+	{
+		Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
+		shared_ptr<Sprite> asteroid_sprite = make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+		asteroid_sprite->SetLoopAnimation(true);
+		shared_ptr<GameObject> asteroid2 = make_shared<Asteroid>();
+		asteroid2->SetBoundingShape(make_shared<BoundingSphere>(asteroid2->GetThisPtr(), 5.0f));
+		asteroid2->SetSprite(asteroid_sprite);
+		asteroid2->SetScale(0.1f);
+		asteroid2->SetPosition(p);
+		mGameWorld->AddObject(asteroid2);
+	}	
 }
 
 void Asteroids::CreateGUI()
