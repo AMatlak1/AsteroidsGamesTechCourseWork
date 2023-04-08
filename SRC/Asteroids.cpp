@@ -288,7 +288,7 @@ shared_ptr<GameObject> Asteroids::CreateSpaceship()
 
 }
 
-
+//Creates the orignal asteroids which populate the game world 
 void Asteroids::CreateAsteroids(const uint num_asteroids)
 {
 	mAsteroidCount = num_asteroids;
@@ -306,14 +306,12 @@ void Asteroids::CreateAsteroids(const uint num_asteroids)
 	}
 }
 
-
+//Creates the Alien space ship and also sets the bullet
 void Asteroids::CreateAlienSpaceShip(const uint num_alienspaceships)
 {
-	
 	mAlienSpaceShipCount = num_alienspaceships;
 	for (uint i = 0; i < num_alienspaceships; i++)
 	{
-	
 		mAlienSpaceShip = make_shared<AlienSpaceShip>();
 		mAlienSpaceShip->SetBoundingShape(make_shared<BoundingSphere>(mAlienSpaceShip->GetThisPtr(), 4.0f));
 		shared_ptr<Shape> bullet_shape = make_shared<Shape>("bullet.shape");
@@ -322,7 +320,6 @@ void Asteroids::CreateAlienSpaceShip(const uint num_alienspaceships)
 		shared_ptr<Sprite> enemy_sprite
 			= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);		
 		enemy_sprite->SetLoopAnimation(true);		
-		
 		mAlienSpaceShip->SetBoundingShape(make_shared<BoundingSphere>(mAlienSpaceShip->GetThisPtr(), 10.0f));
 		mAlienSpaceShip->SetSprite(enemy_sprite);
 		mAlienSpaceShip->SetScale(0.2f);
