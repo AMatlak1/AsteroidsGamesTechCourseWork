@@ -70,6 +70,7 @@ void Asteroids::Start()
 	// Create some asteroids and add them to the world
 	CreateAsteroids(10);
 
+	//Creates the Alien space ship and adds it to the world
 	CreateAlienSpaceShip(1);
 
 	//Reads High Score Numbers From File
