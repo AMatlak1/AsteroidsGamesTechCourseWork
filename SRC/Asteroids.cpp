@@ -346,7 +346,7 @@ void Asteroids::CreateSplitAsteroids(const uint num_asteroids, GLVector3f p)
 		asteroid2->SetScale(0.1f);
 		asteroid2->SetPosition(p);
 		mGameWorld->AddObject(asteroid2);
-	}	
+	}
 }
 
 void Asteroids::CreateGUI()
